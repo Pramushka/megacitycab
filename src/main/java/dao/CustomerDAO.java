@@ -1,42 +1,47 @@
 package dao;
-import config.DatabaseConfig;
-import model.Customer;
 
+import model.Customer;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CustomerDAO {
-    public void addCustomer(Customer customer) {
-        String sql = "INSERT INTO Customers (name, email, phone) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, customer.getName());
-            stmt.setString(2, customer.getEmail());
-            stmt.setString(3, customer.getPhone());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private Connection connection;
+
+    public CustomerDAO(Connection connection) {
+        this.connection = connection;
     }
 
-    public List<Customer> getAllCustomers() {
-        List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT * FROM Customers";
-        try (Connection conn = DatabaseConfig.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                customers.add(new Customer(
-                        rs.getInt("customerId"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("phone")
-                ));
+    // CREATE: Adds a new customer
+    public boolean addCustomer(Customer customer) throws SQLException {
+        String userQuery = "INSERT INTO user (first_name, last_name, email, phone, password, user_type) VALUES (?, ?, ?, ?, ?, ?)";
+        String customerQuery = "INSERT INTO customer (user_id) VALUES (?)";
+
+        try (PreparedStatement userStmt = connection.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement customerStmt = connection.prepareStatement(customerQuery)) {
+
+            // Insert into User table
+            userStmt.setString(1, customer.getFirstName());
+            userStmt.setString(2, customer.getLastName());
+            userStmt.setString(3, customer.getEmail());
+            userStmt.setString(4, customer.getPhone());
+            userStmt.setString(5, customer.getPassword());
+            userStmt.setString(6, "CUSTOMER");
+
+            int affectedRows = userStmt.executeUpdate();
+            if (affectedRows == 0) {
+                return false; // User insertion failed
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+            // Get the generated user ID
+            ResultSet generatedKeys = userStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int userId = generatedKeys.getInt(1);
+
+                // Insert into Customer table
+                customerStmt.setInt(1, userId);
+                int customerRows = customerStmt.executeUpdate();
+                return customerRows > 0; // Return true if customer was added successfully
+            }
         }
-        return customers;
+        return false;
     }
 }
