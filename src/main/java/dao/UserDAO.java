@@ -1,7 +1,5 @@
 package dao;
 
-import model.Customer;
-import model.Driver;
 import model.User;
 import java.sql.*;
 
@@ -12,7 +10,8 @@ public class UserDAO {
         this.connection = connection;
     }
 
-    public boolean addUser(User user) throws SQLException {
+    // ✅ Insert user and return user_id
+    public int addUser(User user) throws SQLException {
         String query = "INSERT INTO user (first_name, last_name, email, phone, password, user_type) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getFirstName());
@@ -23,55 +22,46 @@ public class UserDAO {
             stmt.setString(6, user.getUserType());
 
             int affectedRows = stmt.executeUpdate();
-            return affectedRows > 0;
+            if (affectedRows == 0) {
+                throw new SQLException("User creation failed, no rows affected.");
+            }
+
+            // ✅ Retrieve generated user_id
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getInt(1);  // Return the new user ID
+            } else {
+                throw new SQLException("User creation failed, no ID obtained.");
+            }
         }
     }
 
+    // ✅ Check if email exists
     public boolean emailExists(String email) throws SQLException {
         String query = "SELECT COUNT(*) FROM user WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
+            return rs.next() && rs.getInt(1) > 0;
         }
-        return false;
     }
 
+    // ✅ Fetch user by email (for login)
     public User getUserByEmail(String email) throws SQLException {
-        String query = "SELECT * FROM user LEFT JOIN customer ON user.user_id = customer.user_id LEFT JOIN driver ON user.user_id = driver.user_id WHERE user.email = ?";
+        String query = "SELECT * FROM user WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String userType = rs.getString("user_type");
-
-                if (userType.equalsIgnoreCase("CUSTOMER")) {
-                    return new Customer(
-                            rs.getInt("customer_id"), // customerId
-                            rs.getInt("user_id"), // userId
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getString("email"),
-                            rs.getString("phone"),
-                            rs.getString("password")
-                    );
-                } else if (userType.equalsIgnoreCase("DRIVER")) {
-                    return new Driver(
-                            rs.getInt("driver_id"), // driverId
-                            rs.getInt("user_id"), // userId
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getString("email"),
-                            rs.getString("phone"),
-                            rs.getString("password"),
-                            rs.getString("license_number"),
-                            rs.getString("status"),
-                            rs.getString("nic"),
-                            rs.getDouble("rating")
-                    );
-                }
+                return new User(
+                        rs.getInt("user_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("password"),
+                        rs.getString("user_type")
+                );
             }
         }
         return null;

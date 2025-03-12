@@ -70,7 +70,7 @@
 
         <!-- Register Link -->
         <div class="text-center mt-3">
-            <a href="register.html" class="text-decoration-none">Don't have an account? Register</a>
+            <a href="register.jsp" class="text-decoration-none">Don't have an account? Register</a>
         </div>
     </div>
 </div>
@@ -95,7 +95,7 @@
             data: JSON.stringify({ email: email, password: password, role: role }),
             success: function(response) {
                 alert("Login successful!");
-                window.location.href = (role === "CUSTOMER") ? "customer-dashboard.html" : "driver-dashboard.html";
+                window.location.href = (role === "CUSTOMER") ? "customer-dashboard.jsp" : "driver-dashboard.jsp";
             },
             error: function() {
                 alert("Invalid credentials. Try again!");

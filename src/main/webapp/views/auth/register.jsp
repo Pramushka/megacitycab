@@ -90,17 +90,30 @@
 
             const userData = { firstName, lastName, email, phone, password, userType: "CUSTOMER" };
 
-            fetch("/auth/register", {
+            // ✅ Fix fetch URL: Must match @WebServlet("/api/auth/*")
+            fetch("/megacitycab_war/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userData)
             })
-                .then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => console.error("Error:", error));
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert("✅ Registration Successful! Redirecting to login...");
+                    window.location.href = "/megacitycab_war/auth/login.jsp"; // ✅ Redirect to login
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("❌ Registration Failed: " + error.message);
+                });
         });
     });
 </script>
+
 
 </body>
 </html>

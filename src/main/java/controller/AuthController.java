@@ -1,6 +1,7 @@
 package controller;
 
 import model.Customer;
+import model.Driver;
 import model.User;
 import service.AuthService;
 
@@ -9,17 +10,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import com.google.gson.Gson;
 
 @WebServlet("/api/auth/*")
 public class AuthController extends HttpServlet {
     private AuthService authService;
+    private Gson gson = new Gson();
 
     public void init() {
         authService = new AuthService();
     }
 
-    // Handles Login and Registration Requests
+    // Handles Login, Customer Registration, and Driver Registration Requests
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
 
@@ -27,12 +31,14 @@ public class AuthController extends HttpServlet {
             loginUser(request, response);
         } else if (path.equals("/register")) {
             registerCustomer(request, response);
+        } else if (path.equals("/register-driver")) {
+            registerDriver(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid API Endpoint");
         }
     }
 
-    // 🔹 Login Handling
+
     private void loginUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -42,33 +48,98 @@ public class AuthController extends HttpServlet {
 
         if (user != null) {
             request.getSession().setAttribute("user", user);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"message\": \"Login successful\"}");
+            request.getSession().setAttribute("userId", user.getUserId());
+
+            // If user is a customer, store customerId & redirect to landing page
+            if (user instanceof Customer) {
+                Customer customer = (Customer) user;
+                request.getSession().setAttribute("customerId", customer.getCustomerId());
+                response.sendRedirect(request.getContextPath() + "/views/customer/landing.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard.jsp"); // Redirect other users
+            }
         } else {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Credentials");
         }
     }
 
-    // 🔹 Register Customer
-    private void registerCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String password = request.getParameter("password");
 
-        // Check if email already exists
-        if (authService.emailExists(email)) {
+    private void registerCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // ✅ Read JSON body correctly
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        Customer customer = gson.fromJson(sb.toString(), Customer.class);
+
+        // ✅ Check if email already exists
+        if (authService.emailExists(customer.getEmail())) {
             response.sendError(HttpServletResponse.SC_CONFLICT, "Email is already registered.");
             return;
         }
 
-        // Creating Customer Object
-        Customer customer = new Customer(0, 0, firstName, lastName, email, phone, password);
-        boolean success = authService.registerCustomer(customer);
+        // ✅ First, create a user
+        User newUser = new User(0, customer.getFirstName(), customer.getLastName(),
+                customer.getEmail(), customer.getPhone(),
+                customer.getPassword(), "CUSTOMER");
 
-        // Response
-        response.setContentType("application/json");
-        response.getWriter().write("{\"message\": \"" + (success ? "Registration Successful" : "Registration Failed") + "\"}");
+        int userId = authService.registerUser(newUser);
+
+        if (userId == -1) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "User Registration Failed");
+            return;
+        }
+
+        // ✅ Now, insert the user into the customer table
+        boolean success = authService.registerCustomer(userId);
+
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/auth/login.jsp"); // ✅ Redirect to login
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Customer Registration Failed");
+        }
     }
+
+    // 🔹 Register Driver
+    private void registerDriver(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // ✅ Read JSON body correctly
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        Driver driver = gson.fromJson(sb.toString(), Driver.class);
+
+        // ✅ Check if email already exists
+        if (authService.emailExists(driver.getEmail())) {
+            response.sendError(HttpServletResponse.SC_CONFLICT, "Email is already registered.");
+            return;
+        }
+
+        // ✅ First, create a user
+        User newUser = new User(0, driver.getFirstName(), driver.getLastName(),
+                driver.getEmail(), driver.getPhone(),
+                driver.getPassword(), "DRIVER");
+
+        int userId = authService.registerUser(newUser);
+
+        if (userId == -1) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "User Registration Failed");
+            return;
+        }
+
+        // ✅ Now, insert into driver table
+        driver.setUserId(userId);  // Set userId from created user
+        boolean success = authService.registerDriver(driver);
+
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/auth/login.jsp"); // ✅ Redirect to login
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Driver Registration Failed");
+        }
+    }
+
 }

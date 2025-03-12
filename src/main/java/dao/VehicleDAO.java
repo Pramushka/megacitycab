@@ -45,7 +45,6 @@ public class VehicleDAO {
         return null;
     }
 
-    // READ (Fetch all vehicles)
     public List<Vehicle> getAllVehicles() throws SQLException {
         List<Vehicle> vehicles = new ArrayList<>();
         String query = "SELECT * FROM vehicle";
@@ -55,7 +54,7 @@ public class VehicleDAO {
                 vehicles.add(new Vehicle(
                         rs.getInt("vehicle_id"),
                         rs.getInt("driver_id"),
-                        rs.getString("vehicle_number"), // Fix column name
+                        rs.getString("license_plate"),
                         rs.getString("model"),
                         rs.getString("type"),
                         rs.getInt("capacity")
