@@ -12,7 +12,7 @@ public class BookingDAO {
         this.connection = connection;
     }
 
-    // BookingDAO.java
+    // ✅ Add Booking and Return Booking ID
     public int addBooking(Booking booking) throws SQLException {
         String query = "INSERT INTO booking (customer_id, driver_id, vehicle_id, pickup_location, dropoff_location, fare, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -28,28 +28,23 @@ public class BookingDAO {
             if (affectedRows > 0) {
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);  // Return generated booking ID
+                    return generatedKeys.getInt(1);
                 }
             }
         }
-        return -1;  // Return -1 if failed
+        return -1;
     }
 
-
-    // ✅ Fetch all bookings of a specific customer (Including Driver & Vehicle Details)
+    // ✅ Fetch all bookings of a specific customer
     public List<Booking> getBookingsByCustomerId(int customerId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String query = "SELECT b.*, d.first_name AS driver_name, d.license_number, v.model AS vehicle_model, v.vehicle_number " +
-                "FROM booking b " +
-                "LEFT JOIN driver d ON b.driver_id = d.driver_id " +
-                "LEFT JOIN vehicle v ON b.vehicle_id = v.vehicle_id " +
-                "WHERE b.customer_id = ?";
+        String query = "SELECT * FROM booking WHERE customer_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, customerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Booking booking = new Booking(
+                bookings.add(new Booking(
                         rs.getInt("booking_id"),
                         rs.getInt("customer_id"),
                         rs.getInt("driver_id"),
@@ -57,25 +52,40 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status"),
-                        rs.getString("driver_name"),
-                        rs.getString("license_number"),
-                        rs.getString("vehicle_model"),
-                        rs.getString("vehicle_number")
-                );
-                bookings.add(booking);
+                        rs.getString("status")
+                ));
             }
         }
         return bookings;
     }
 
-    // ✅ Fetch a single booking by ID (Including Driver & Vehicle Details)
+    // ✅ Fetch all bookings assigned to a specific driver
+    public List<Booking> getBookingsByDriverId(int driverId) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String query = "SELECT * FROM booking WHERE driver_id = ? AND (status = 'ACCEPTED' OR status = 'IN_PROGRESS')";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, driverId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                bookings.add(new Booking(
+                        rs.getInt("booking_id"),
+                        rs.getInt("customer_id"),
+                        rs.getInt("driver_id"),
+                        rs.getInt("vehicle_id"),
+                        rs.getString("pickup_location"),
+                        rs.getString("dropoff_location"),
+                        rs.getDouble("fare"),
+                        rs.getString("status")
+                ));
+            }
+        }
+        return bookings;
+    }
+
+    // ✅ Fetch a single booking by ID
     public Booking getBookingById(int bookingId) throws SQLException {
-        String query = "SELECT b.*, d.first_name AS driver_name, d.license_number, v.model AS vehicle_model, v.vehicle_number " +
-                "FROM booking b " +
-                "LEFT JOIN driver d ON b.driver_id = d.driver_id " +
-                "LEFT JOIN vehicle v ON b.vehicle_id = v.vehicle_id " +
-                "WHERE b.booking_id = ?";
+        String query = "SELECT * FROM booking WHERE booking_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, bookingId);
@@ -89,11 +99,7 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status"),
-                        rs.getString("driver_name"),
-                        rs.getString("license_number"),
-                        rs.getString("vehicle_model"),
-                        rs.getString("vehicle_number")
+                        rs.getString("status")
                 );
             }
         }
@@ -109,15 +115,36 @@ public class BookingDAO {
         }
     }
 
-    // ✅ Fetch available bookings (for drivers to accept)
-    public List<Booking> getAvailableBookings() throws SQLException {
-        List<Booking> availableBookings = new ArrayList<>();
-        String query = "SELECT * FROM booking WHERE status = 'REQUESTED'";
+    // ✅ Assign a driver to a booking
+    public boolean assignDriverToBooking(int bookingId, int driverId) throws SQLException {
+        String query = "UPDATE booking SET driver_id = ?, status = 'ACCEPTED' WHERE booking_id = ? AND status = 'REQUESTED'";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, driverId);
+            stmt.setInt(2, bookingId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
 
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+    // ✅ Update Booking Status (STARTED, COMPLETED, CANCELLED)
+    public boolean updateBookingStatus(int bookingId, String status) throws SQLException {
+        String query = "UPDATE booking SET status = ? WHERE booking_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, bookingId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    // ✅ Fetch ride history for a driver (Completed Rides)
+    public List<Booking> getRideHistory(int driverId) throws SQLException {
+        List<Booking> rideHistory = new ArrayList<>();
+        String query = "SELECT * FROM booking WHERE driver_id = ? AND status = 'COMPLETED'";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, driverId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                availableBookings.add(new Booking(
+                rideHistory.add(new Booking(
                         rs.getInt("booking_id"),
                         rs.getInt("customer_id"),
                         rs.getInt("driver_id"),
@@ -129,26 +156,16 @@ public class BookingDAO {
                 ));
             }
         }
-        return availableBookings;
+        return rideHistory;
     }
 
-    // ✅ Assign a driver to a booking
-    public boolean assignDriverToBooking(int bookingId, int driverId) throws SQLException {
-        String query = "UPDATE booking SET driver_id = ?, status = 'ACCEPTED' WHERE booking_id = ? AND status = 'REQUESTED'";
+    // ✅ Mark Payment as Completed when ride is done
+    public boolean completePayment(int bookingId) throws SQLException {
+        String query = "UPDATE payment SET status = 'COMPLETED' WHERE booking_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, driverId);
-            stmt.setInt(2, bookingId);
+            stmt.setInt(1, bookingId);
             return stmt.executeUpdate() > 0;
         }
     }
 
-    // ✅ Update Booking Status
-    public boolean updateBookingStatus(int bookingId, String status) throws SQLException {
-        String query = "UPDATE booking SET status = ? WHERE booking_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, status);
-            stmt.setInt(2, bookingId);
-            return stmt.executeUpdate() > 0;
-        }
-    }
 }

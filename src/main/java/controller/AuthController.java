@@ -54,13 +54,21 @@ public class AuthController extends HttpServlet {
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getUserId());
 
-            // If user is a customer, store customerId & redirect to landing page
+            // ✅ Redirect Customers
             if (user instanceof Customer) {
                 Customer customer = (Customer) user;
                 session.setAttribute("customerId", customer.getCustomerId());
                 response.sendRedirect(request.getContextPath() + "/views/customer/landing.jsp");
+
+                // ✅ Redirect Drivers
+            } else if (user instanceof Driver) {
+                Driver driver = (Driver) user;
+                session.setAttribute("driverId", driver.getDriverId());
+                response.sendRedirect(request.getContextPath() + "/views/driver/DriverDashboard.jsp");
+
+                // ✅ Redirect Other Users (Admins, etc.)
             } else {
-                response.sendRedirect(request.getContextPath() + "/dashboard.jsp"); // Redirect other users
+                response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
             }
         } else {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Credentials");

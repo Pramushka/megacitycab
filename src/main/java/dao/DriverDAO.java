@@ -42,4 +42,15 @@ public class DriverDAO {
         }
         return null;
     }
+
+    public boolean submitVerification(int driverId, String contact, String referral) throws SQLException {
+        String query = "UPDATE driver SET additional_contact = ?, referral_code = ?, is_verified = 'PENDING' WHERE driver_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, contact);
+            stmt.setString(2, referral);
+            stmt.setInt(3, driverId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
 }
