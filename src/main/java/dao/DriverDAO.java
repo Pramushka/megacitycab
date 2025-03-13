@@ -2,6 +2,8 @@ package dao;
 
 import model.Driver;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DriverDAO {
     private Connection connection;
@@ -53,4 +55,24 @@ public class DriverDAO {
         }
     }
 
+    // ✅ Fetch available drivers (For assigning to bookings)
+    public List<Driver> getAvailableDrivers() throws SQLException {
+        List<Driver> drivers = new ArrayList<>();
+        String query = "SELECT * FROM driver WHERE status = 'AVAILABLE'";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                drivers.add(new Driver(
+                        rs.getInt("driver_id"),
+                        rs.getInt("user_id"),
+                        rs.getString("nic"),
+                        rs.getString("license_number"),
+                        rs.getString("status"),
+                        rs.getDouble("rating")
+                ));
+            }
+        }
+        return drivers;
+    }
 }
