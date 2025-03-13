@@ -6,22 +6,18 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
-<%@ page import="model.User" %>
-<%@ page import="model.Customer" %>
-<%@ page import="java.util.List" %>
-<%@ page import="model.Vehicle" %>
-<%@ page import="dao.VehicleDAO" %>
-<%@ page import="config.DatabaseConfig" %>
-<%
-    // Retrieve the logged-in user session
-    User user = (User) session.getAttribute("user");
+<%@ page import="model.User, model.Vehicle, dao.VehicleDAO, config.DatabaseConfig, java.util.List" %>
+<%@ include file="../includes/navbar.jsp" %>
 
-    if (user == null || session.getAttribute("customerId") == null) {
-        response.sendRedirect(request.getContextPath() + "/auth/login.jsp"); // Redirect if not logged in
+<%
+    User user = (User) session.getAttribute("user");
+    Integer customerId = (Integer) session.getAttribute("customerId");
+
+    if (user == null || customerId == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         return;
     }
 
-    // Retrieve available vehicles from the database
     List<Vehicle> availableVehicles = new VehicleDAO(DatabaseConfig.getConnection()).getAllVehicles();
 %>
 <!DOCTYPE html>
@@ -29,7 +25,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome, <%= user.getFirstName() %> | MegaCityCab</title>
+    <title>MegaCityCab | Book Your Ride</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -104,7 +100,7 @@
                 <p><strong>Type:</strong> <%= vehicle.getType() %></p>
                 <p><strong>Capacity:</strong> <%= vehicle.getCapacity() %></p>
                 <p><strong>Vehicle Number:</strong> <%= vehicle.getVehicleNumber() %></p>
-                <a href="bookVehicle.jsp?vehicleId=<%= vehicle.getVehicleId() %>" class="book-btn">Book Now</a>
+                <a href="<%= request.getContextPath() %>/views/customer/book-vehicle.jsp?vehicleId=<%= vehicle.getVehicleId() %>" class="book-btn">Book Now</a>
             </div>
             <% } %>
         </div>
