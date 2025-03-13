@@ -24,25 +24,25 @@ public class AuthServiceTest {
         }
     }
 
-//    @Test
-//    public void testRegisterCustomer() {
-//        try (Connection connection = DatabaseConfig.getConnection()) {
-//            AuthService authService = new AuthService();
-//
-//            User testUser = new User(0, "Test", "User", "testuser@example.com",
-//                    "1234567890", "password123", "CUSTOMER");
-//
-//            int userId = authService.registerUser(testUser);
-//            assertNotEquals(-1, userId, "User registration should return a valid user ID");
-//
-//            boolean customerCreated = authService.registerCustomer(userId);
-//            assertTrue(customerCreated, "Customer should be successfully created in the database");
-//
-//            System.out.println("✅ Customer Registration Test Passed");
-//        } catch (SQLException e) {
-//            fail("Database connection failed: " + e.getMessage());
-//        }
-//    }
+    @Test
+    public void testRegisterCustomer() {
+        try (Connection connection = DatabaseConfig.getConnection()) {
+            AuthService authService = new AuthService();
+
+            User testUser = new User(0, "Test2", "User2", "testuser2@example.com",
+                    "1234567890", "password1234", "CUSTOMER");
+
+            int userId = authService.registerUser(testUser);
+            assertNotEquals(-1, userId, "User registration should return a valid user ID");
+
+            boolean customerCreated = authService.registerCustomer(userId);
+            assertTrue(customerCreated, "Customer should be successfully created in the database");
+
+            System.out.println("✅ Customer Registration Test Passed");
+        } catch (SQLException e) {
+            fail("Database connection failed: " + e.getMessage());
+        }
+    }
 
     @Test
     public void testLoginWithValidCredentials() {

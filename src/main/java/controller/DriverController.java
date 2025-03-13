@@ -62,7 +62,7 @@ public class DriverController extends HttpServlet {
     }
 
     // ✅ Fetch Assigned Rides
-    private void getAssignedBookings(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void getAssignedBookings(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int driverId = (int) request.getSession().getAttribute("driverId");
         try {
             List<Booking> assignedBookings = driverService.getAssignedBookings(driverId);

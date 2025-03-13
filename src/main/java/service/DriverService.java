@@ -9,8 +9,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class DriverService {
-    private DriverDAO driverDAO;
-    private BookingDAO bookingDAO;
+    private final DriverDAO driverDAO;
+    private final BookingDAO bookingDAO;
+
+    // Constructor Injection
+    public DriverService(DriverDAO driverDAO, BookingDAO bookingDAO) {
+        this.driverDAO = driverDAO;
+        this.bookingDAO = bookingDAO;
+    }
 
     public DriverService() throws SQLException {
         this.driverDAO = new DriverDAO(DatabaseConfig.getConnection());
