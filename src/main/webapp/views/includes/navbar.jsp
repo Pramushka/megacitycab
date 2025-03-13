@@ -19,6 +19,11 @@
             <% } else { %>
             <a href="<%= request.getContextPath() %>/views/auth/login.jsp">Login</a>
             <% } %>
+
+            <!-- Admin Login Button -->
+            <a href="<%= request.getContextPath() %>/views/admin/login.jsp" class="admin-icon" title="Admin Login">
+                &#128274; Admin
+            </a>
         </div>
     </div>
 </nav>
@@ -37,13 +42,27 @@
         text-decoration: none;
         font-weight: bold;
     }
+    .nav-links {
+        display: flex;
+        align-items: center;
+    }
     .nav-links a {
         margin-left: 15px;
         color: white;
         text-decoration: none;
+        font-size: 16px;
     }
     .nav-links span {
         color: white;
         font-weight: bold;
+    }
+    .admin-icon {
+        font-weight: bold;
+        color: yellow;
+        margin-left: 15px;
+        font-size: 16px;
+    }
+    .admin-icon:hover {
+        color: orange;
     }
 </style>

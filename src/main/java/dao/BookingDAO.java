@@ -167,5 +167,26 @@ public class BookingDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+    // ✅ Fetch all bookings (For Admin)
+    public List<Booking> getAllBookings() throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String query = "SELECT * FROM booking";
 
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                bookings.add(new Booking(
+                        rs.getInt("booking_id"),
+                        rs.getInt("customer_id"),
+                        rs.getInt("driver_id"),
+                        rs.getInt("vehicle_id"),
+                        rs.getString("pickup_location"),
+                        rs.getString("dropoff_location"),
+                        rs.getDouble("fare"),
+                        rs.getString("status")
+                ));
+            }
+        }
+        return bookings;
+    }
 }
