@@ -4,9 +4,9 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          version="3.0">
+
   <display-name>MegacityCab</display-name>
 
-  <!-- Redirect to /auth/login on startup -->
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
@@ -14,4 +14,42 @@
   <session-config>
     <session-timeout>30</session-timeout> <!-- 30 minutes -->
   </session-config>
+
+  <servlet>
+    <servlet-name>AuthController</servlet-name>
+    <servlet-class>controller.AuthController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AuthController</servlet-name>
+    <url-pattern>/api/auth/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>BookingController</servlet-name>
+    <servlet-class>controller.BookingController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BookingController</servlet-name>
+    <url-pattern>/api/bookings/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>DriverController</servlet-name>
+    <servlet-class>controller.DriverController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DriverController</servlet-name>
+    <url-pattern>/api/driver/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>AdminController</servlet-name>
+    <servlet-class>controller.AdminController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>AdminController</servlet-name>
+    <url-pattern>/api/admin/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>

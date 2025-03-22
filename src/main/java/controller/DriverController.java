@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 import com.google.gson.Gson;
 
-@WebServlet("/api/driver/*")
+//@WebServlet("/api/driver/*")
 public class DriverController extends HttpServlet {
     private DriverService driverService;
     private Gson gson = new Gson();

@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<% response.sendRedirect("views/auth/login.jsp"); %>
+<% response.sendRedirect("views/customer/landing.jsp"); %>
 
 <%--<html>--%>
 <%--<body>--%>

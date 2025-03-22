@@ -15,7 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import com.google.gson.Gson;
 
-@WebServlet("/api/auth/*")
+//@WebServlet("/api/auth/*")
 public class AuthController extends HttpServlet {
     private AuthService authService;
     private Gson gson = new Gson();

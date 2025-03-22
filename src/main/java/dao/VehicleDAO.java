@@ -54,7 +54,7 @@ public class VehicleDAO {
                 vehicles.add(new Vehicle(
                         rs.getInt("vehicle_id"),
                         rs.getInt("driver_id"),
-                        rs.getString("license_plate"),
+                        rs.getString("vehicle_number"),
                         rs.getString("model"),
                         rs.getString("type"),
                         rs.getInt("capacity")

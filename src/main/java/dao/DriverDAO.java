@@ -55,7 +55,7 @@ public class DriverDAO {
         }
     }
 
-    // ✅ Fetch available drivers (For assigning to bookings)
+    //  Fetch available drivers (For assigning to bookings)
     public List<Driver> getAvailableDrivers() throws SQLException {
         List<Driver> drivers = new ArrayList<>();
         String query = "SELECT * FROM driver WHERE status = 'AVAILABLE'";

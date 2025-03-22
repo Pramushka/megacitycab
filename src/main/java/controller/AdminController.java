@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/api/admin/*")
+//@WebServlet("/api/admin/*")
 public class AdminController extends HttpServlet {
     private AdminService adminService;
 

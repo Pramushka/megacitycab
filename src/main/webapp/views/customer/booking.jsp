@@ -47,9 +47,9 @@
     <form id="bookingForm">
         <label for="vehicle">Select Vehicle:</label>
         <select id="vehicle" required>
-            <% for (Vehicle vehicle : availableVehicles) { %>
-            <option value="<%= vehicle.getVehicleId() %>"><%= vehicle.getModel() %> - <%= vehicle.getVehicleNumber() %></option>
-            <% } %>
+<%--            <% for (Vehicle vehicle : availableVehicles) { %>--%>
+<%--            <option value="<%= vehicle.getVehicleId() %>"><%= vehicle.getModel() %> - <%= vehicle.getVehicleNumber() %></option>--%>
+<%--            <% } %>--%>
         </select>
 
         <label for="pickup">Pickup Location:</label>

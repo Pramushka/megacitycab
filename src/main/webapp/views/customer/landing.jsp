@@ -1,31 +1,22 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Ninu
-  Date: 13/03/2025
-  Time: 01:47
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
-<%@ page import="model.User, model.Vehicle, dao.VehicleDAO, config.DatabaseConfig, java.util.List" %>
+<%@ page import="model.User" %>
 <%@ include file="../includes/navbar.jsp" %>
 
 <%
-    User user = (User) session.getAttribute("user");
-    Integer customerId = (Integer) session.getAttribute("customerId");
-
-    if (user == null || customerId == null) {
-        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
-        return;
-    }
-
-    List<Vehicle> availableVehicles = new VehicleDAO(DatabaseConfig.getConnection()).getAllVehicles();
+    // Check if a user is logged in
+    User loggedInUser = (User) session.getAttribute("user");
+    boolean isLoggedIn = (loggedInUser != null);
+    String bookUrl = request.getContextPath() + "/views/customer/book-vehicle.jsp?vehicleId=";
+    String loginUrl = request.getContextPath() + "/views/auth/login.jsp";
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MegaCityCab | Book Your Ride</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,7 +30,7 @@
             padding: 20px;
         }
         .banner {
-            background: url('${pageContext.request.contextPath}/assets/banner.jpg') no-repeat center center/cover;
+            background: url('<%= request.getContextPath() %>/assets/banner.jpg') no-repeat center center/cover;
             height: 300px;
             display: flex;
             align-items: center;
@@ -86,26 +77,68 @@
 <body>
 
 <div class="banner">
-    Welcome to MegaCityCab, <%= user.getFirstName() %>!
+    Welcome to MegaCityCab,
+    <% if (isLoggedIn) { %>
+    <%= loggedInUser.getFirstName() %>!
+    <% } else { %>
+    Guest!
+    <% } %>
 </div>
 
 <div class="container">
     <!-- Available Vehicles Section -->
     <div class="section">
         <h2>Available Vehicles</h2>
-        <div class="vehicle-list">
-            <% for (Vehicle vehicle : availableVehicles) { %>
-            <div class="vehicle-card">
-                <h3><%= vehicle.getModel() %></h3>
-                <p><strong>Type:</strong> <%= vehicle.getType() %></p>
-                <p><strong>Capacity:</strong> <%= vehicle.getCapacity() %></p>
-                <p><strong>Vehicle Number:</strong> <%= vehicle.getVehicleNumber() %></p>
-                <a href="<%= request.getContextPath() %>/views/customer/book-vehicle.jsp?vehicleId=<%= vehicle.getVehicleId() %>" class="book-btn">Book Now</a>
-            </div>
-            <% } %>
+        <div class="vehicle-list" id="vehicle-list">
+            <p>Loading available vehicles...</p>  <!-- Placeholder while loading -->
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '<%= request.getContextPath() %>/api/vehicles', // ✅ Fetch vehicles from API
+            type: 'GET',
+            dataType: 'json',
+            success: function (vehicles) {
+                let vehicleList = $('#vehicle-list');
+                vehicleList.empty();  // Clear existing content
+
+                if (vehicles.length === 0) {
+                    vehicleList.append('<p>No available vehicles at the moment.</p>');
+                } else {
+                    vehicles.forEach(vehicle => {
+                        // Ensure all data fields exist
+                        let vehicleModel = vehicle.model ? vehicle.model : 'Unknown Model';
+                        let vehicleType = vehicle.type ? vehicle.type : 'Unknown Type';
+                        let vehicleCapacity = vehicle.capacity ? vehicle.capacity : 'N/A';
+                        let vehicleNumber = vehicle.vehicleNumber ? vehicle.vehicleNumber : 'N/A';
+
+                        // Create the Book Now / Login to Book button
+                        let bookLink = `<a href="<%= bookUrl %>${vehicle.vehicleId}" class="book-btn">Book Now</a>`;
+                        let loginLink = `<a href="<%= loginUrl %>" class="book-btn">Login to Book</a>`;
+                        let actionButton = <%= isLoggedIn %> ? bookLink : loginLink;
+
+                        let vehicleCard = `
+                        <div class="vehicle-card">
+                            <h3>${vehicleModel}</h3>
+                            <p><strong>Type:</strong> ${vehicleType}</p>
+                            <p><strong>Capacity:</strong> ${vehicleCapacity}</p>
+                            <p><strong>Vehicle Number:</strong> ${vehicleNumber}</p>
+                            ${actionButton}
+                        </div>
+                    `;
+                        vehicleList.append(vehicleCard);
+                    });
+                }
+            },
+            error: function () {
+                $('#vehicle-list').html('<p>Error fetching vehicle data.</p>');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

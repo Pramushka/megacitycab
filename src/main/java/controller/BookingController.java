@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 import com.google.gson.Gson;
 
-@WebServlet("/api/bookings/*")
+//@WebServlet("/api/bookings/*")
 public class BookingController extends HttpServlet {
     private BookingService bookingService;
     private Gson gson = new Gson();

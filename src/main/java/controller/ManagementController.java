@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 import com.google.gson.Gson;
 
-@WebServlet("/api/admin/management/*")
+//@WebServlet("/api/admin/management/*")
 public class ManagementController extends HttpServlet {
     private ManagementService managementService;
     private Gson gson = new Gson();
@@ -69,4 +69,6 @@ public class ManagementController extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating booking status");
         }
     }
+
+
 }
