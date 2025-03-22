@@ -28,9 +28,10 @@
     <servlet-name>BookingController</servlet-name>
     <servlet-class>controller.BookingController</servlet-class>
   </servlet>
+
   <servlet-mapping>
     <servlet-name>BookingController</servlet-name>
-    <url-pattern>/api/bookings/*</url-pattern>
+    <url-pattern>/book-ride</url-pattern>
   </servlet-mapping>
 
   <servlet>

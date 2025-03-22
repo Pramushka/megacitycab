@@ -6,8 +6,6 @@
     // Check if a user is logged in
     User loggedInUser = (User) session.getAttribute("user");
     boolean isLoggedIn = (loggedInUser != null);
-    String bookUrl = request.getContextPath() + "/views/customer/book-vehicle.jsp?vehicleId=";
-    String loginUrl = request.getContextPath() + "/views/auth/login.jsp";
 %>
 
 <!DOCTYPE html>
@@ -73,6 +71,11 @@
             background: #0056b3;
         }
     </style>
+
+    <script>
+        const contextPath = '<%= request.getContextPath() %>';
+        const isLoggedIn = <%= isLoggedIn %>;
+    </script>
 </head>
 <body>
 
@@ -90,7 +93,7 @@
     <div class="section">
         <h2>Available Vehicles</h2>
         <div class="vehicle-list" id="vehicle-list">
-            <p>Loading available vehicles...</p>  <!-- Placeholder while loading -->
+            <p>Loading available vehicles...</p>
         </div>
     </div>
 </div>
@@ -98,37 +101,35 @@
 <script>
     $(document).ready(function () {
         $.ajax({
-            url: '<%= request.getContextPath() %>/api/vehicles', // ✅ Fetch vehicles from API
+            url: contextPath + '/api/vehicles',
             type: 'GET',
             dataType: 'json',
             success: function (vehicles) {
                 let vehicleList = $('#vehicle-list');
-                vehicleList.empty();  // Clear existing content
+                vehicleList.empty();
 
                 if (vehicles.length === 0) {
                     vehicleList.append('<p>No available vehicles at the moment.</p>');
                 } else {
                     vehicles.forEach(vehicle => {
-                        // Ensure all data fields exist
-                        let vehicleModel = vehicle.model ? vehicle.model : 'Unknown Model';
-                        let vehicleType = vehicle.type ? vehicle.type : 'Unknown Type';
-                        let vehicleCapacity = vehicle.capacity ? vehicle.capacity : 'N/A';
-                        let vehicleNumber = vehicle.vehicleNumber ? vehicle.vehicleNumber : 'N/A';
+                        let vehicleModel = vehicle.model || 'Unknown Model';
+                        let vehicleType = vehicle.type || 'Unknown Type';
+                        let vehicleCapacity = vehicle.capacity || 'N/A';
+                        let vehicleNumber = vehicle.vehicleNumber || 'N/A';
 
-                        // Create the Book Now / Login to Book button
-                        let bookLink = `<a href="<%= bookUrl %>${vehicle.vehicleId}" class="book-btn">Book Now</a>`;
-                        let loginLink = `<a href="<%= loginUrl %>" class="book-btn">Login to Book</a>`;
-                        let actionButton = <%= isLoggedIn %> ? bookLink : loginLink;
+                        let bookLink = `<a href="${contextPath}/book-ride?vehicleId=${vehicle.vehicleId}" class="book-btn">Book Now</a>`;
+                        let loginLink = `<a href="${contextPath}/views/auth/login.jsp" class="book-btn">Login to Book</a>`;
+                        let actionButton = isLoggedIn ? bookLink : loginLink;
 
                         let vehicleCard = `
-                        <div class="vehicle-card">
-                            <h3>${vehicleModel}</h3>
-                            <p><strong>Type:</strong> ${vehicleType}</p>
-                            <p><strong>Capacity:</strong> ${vehicleCapacity}</p>
-                            <p><strong>Vehicle Number:</strong> ${vehicleNumber}</p>
-                            ${actionButton}
-                        </div>
-                    `;
+                            <div class="vehicle-card">
+                                <h3>${vehicleModel}</h3>
+                                <p><strong>Type:</strong> ${vehicleType}</p>
+                                <p><strong>Capacity:</strong> ${vehicleCapacity}</p>
+                                <p><strong>Vehicle Number:</strong> ${vehicleNumber}</p>
+                                ${actionButton}
+                            </div>
+                        `;
                         vehicleList.append(vehicleCard);
                     });
                 }

@@ -2,10 +2,14 @@ package service;
 
 import config.DatabaseConfig;
 import dao.BookingDAO;
+import dao.VehicleDAO;
 import model.Booking;
+import model.Vehicle;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.util.Date;
 import java.util.List;
 
 public class BookingService {
@@ -22,10 +26,10 @@ public class BookingService {
         this.bookingDAO = bookingDAO;
     }
 
-    // ✅ Create Booking and return booking ID
     public int createBooking(Booking booking) throws SQLException {
         return bookingDAO.addBooking(booking);
     }
+
 
     // ✅ Get Booking by ID
     public Booking getBookingById(int bookingId) throws SQLException {
@@ -50,5 +54,11 @@ public class BookingService {
     // ✅ Update Booking Status
     public boolean updateBookingStatus(int bookingId, String status) throws SQLException {
         return bookingDAO.updateBookingStatus(bookingId, status);
+    }
+
+    public List<Vehicle> getAvailableVehicles(Date date, Time time) throws SQLException {
+        Connection conn = DatabaseConfig.getConnection();
+        VehicleDAO vehicleDAO = new VehicleDAO(conn);
+        return vehicleDAO.getAllVehicles();
     }
 }

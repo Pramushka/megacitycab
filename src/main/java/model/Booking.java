@@ -1,5 +1,8 @@
 package model;
 
+import java.sql.Date;
+import java.sql.Time;
+
 public class Booking {
     private int bookingId;
     private int customerId;
@@ -9,9 +12,12 @@ public class Booking {
     private String dropoffLocation;
     private double fare;
     private String status;
+    private Date bookingDate;
+    private Time bookingTime;
 
-    // ✅ Constructor
-    public Booking(int bookingId, int customerId, int driverId, int vehicleId, String pickupLocation, String dropoffLocation, double fare, String status) {
+    public Booking() {}
+
+    public Booking(int bookingId, int customerId, int driverId, int vehicleId, String pickupLocation, String dropoffLocation, double fare, String status, Date bookingDate, Time bookingTime) {
         this.bookingId = bookingId;
         this.customerId = customerId;
         this.driverId = driverId;
@@ -20,9 +26,11 @@ public class Booking {
         this.dropoffLocation = dropoffLocation;
         this.fare = fare;
         this.status = status;
+        this.bookingDate = bookingDate;
+        this.bookingTime = bookingTime;
     }
 
-    // ✅ Getters and Setters
+    // Getters & Setters
     public int getBookingId() { return bookingId; }
     public void setBookingId(int bookingId) { this.bookingId = bookingId; }
 
@@ -46,4 +54,10 @@ public class Booking {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Date getBookingDate() { return bookingDate; }
+    public void setBookingDate(Date bookingDate) { this.bookingDate = bookingDate; }
+
+    public Time getBookingTime() { return bookingTime; }
+    public void setBookingTime(Time bookingTime) { this.bookingTime = bookingTime; }
 }

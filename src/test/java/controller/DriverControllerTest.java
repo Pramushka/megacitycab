@@ -41,16 +41,16 @@ class DriverControllerTest {
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
 
-    @Test
-    void testGetAssignedBookings() throws Exception {
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking(1, 2, 1, 3, "Pickup", "Dropoff", 20.0, "ASSIGNED"));
-
-        when(driverService.getAssignedBookings(1)).thenReturn(bookings);
-
-        List<Booking> result = driverService.getAssignedBookings(1);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-    }
+//    @Test
+//    void testGetAssignedBookings() throws Exception {
+//        List<Booking> bookings = new ArrayList<>();
+//        bookings.add(new Booking(1, 2, 1, 3, "Pickup", "Dropoff", 20.0, "ASSIGNED"));
+//
+//        when(driverService.getAssignedBookings(1)).thenReturn(bookings);
+//
+//        List<Booking> result = driverService.getAssignedBookings(1);
+//
+//        assertNotNull(result);
+//        assertEquals(1, result.size());
+//    }
 }

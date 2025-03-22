@@ -41,11 +41,11 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    // 🔹 Login Handling
+    //  Login Handling
     private void loginUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String role = request.getParameter("role");
+        String role = request.getParameter("userType");
 
         User user = authService.authenticate(email, password, role);
 
@@ -54,28 +54,25 @@ public class AuthController extends HttpServlet {
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getUserId());
 
-            // ✅ Redirect Customers
             if (user instanceof Customer) {
                 Customer customer = (Customer) user;
                 session.setAttribute("customerId", customer.getCustomerId());
-                response.sendRedirect(request.getContextPath() + "/views/customer/landing.jsp");
-
-                // ✅ Redirect Drivers
             } else if (user instanceof Driver) {
                 Driver driver = (Driver) user;
                 session.setAttribute("driverId", driver.getDriverId());
-                response.sendRedirect(request.getContextPath() + "/views/driver/DriverDashboard.jsp");
-
-                // ✅ Redirect Other Users (Admins, etc.)
-            } else {
-                response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
             }
+
+            // ✅ Always redirect to landing.jsp
+            String redirectUrl = request.getContextPath() + "/views/customer/landing.jsp";
+            response.sendRedirect(redirectUrl);
         } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Credentials");
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp?error=invalid");
         }
     }
 
-    // 🔹 Register Customer
+
+
+    //  Register Customer
     private void registerCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = request.getReader();
@@ -104,7 +101,7 @@ public class AuthController extends HttpServlet {
         boolean success = authService.registerCustomer(userId);
 
         if (success) {
-            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         } else {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Customer Registration Failed");
         }

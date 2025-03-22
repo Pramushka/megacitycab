@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/api/vehicles")  // ✅ This API fetches vehicle data
+//@WebServlet("/api/vehicles")  //  This API fetches vehicle data
 public class VehicleController extends HttpServlet {
     private ManagementService managementService;
 

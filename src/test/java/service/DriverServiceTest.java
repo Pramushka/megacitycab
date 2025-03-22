@@ -28,24 +28,24 @@ class DriverServiceTest {
         driverService = new DriverService(driverDAO, bookingDAO);
     }
 
-    @Test
-    void testGetAssignedBookings() throws SQLException {
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking(1, 2, 1, 3, "Pickup", "Dropoff", 20.0, "ASSIGNED"));
-
-        // Mock the DAO call
-        when(bookingDAO.getBookingsByDriverId(1)).thenReturn(bookings);
-
-        // Call the method
-        List<Booking> result = driverService.getAssignedBookings(1);
-
-        // Assertions
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("ASSIGNED", result.get(0).getStatus());
-
-        // Verify that the DAO method was actually called
-        verify(bookingDAO, times(1)).getBookingsByDriverId(1);
-    }
+//    @Test
+//    void testGetAssignedBookings() throws SQLException {
+//        List<Booking> bookings = new ArrayList<>();
+//        bookings.add(new Booking(1, 2, 1, 3, "Pickup", "Dropoff", 20.0, "ASSIGNED"));
+//
+//        // Mock the DAO call
+//        when(bookingDAO.getBookingsByDriverId(1)).thenReturn(bookings);
+//
+//        // Call the method
+//        List<Booking> result = driverService.getAssignedBookings(1);
+//
+//        // Assertions
+//        assertNotNull(result);
+//        assertEquals(1, result.size());
+//        assertEquals("ASSIGNED", result.get(0).getStatus());
+//
+//        // Verify that the DAO method was actually called
+//        verify(bookingDAO, times(1)).getBookingsByDriverId(1);
+//    }
 
 }

@@ -1,9 +1,12 @@
 package dao;
 
 import model.Booking;
+import model.Vehicle;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Date;
 
 public class BookingDAO {
     private Connection connection;
@@ -14,7 +17,7 @@ public class BookingDAO {
 
     // ✅ Add Booking and Return Booking ID
     public int addBooking(Booking booking) throws SQLException {
-        String query = "INSERT INTO booking (customer_id, driver_id, vehicle_id, pickup_location, dropoff_location, fare, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO booking (customer_id, driver_id, vehicle_id, pickup_location, dropoff_location, fare, status, booking_date, booking_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, booking.getCustomerId());
             stmt.setInt(2, booking.getDriverId());
@@ -52,7 +55,9 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getDate("booking_date"),
+                        rs.getTime("booking_time")
                 ));
             }
         }
@@ -76,7 +81,9 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getDate("booking_date"),
+                        rs.getTime("booking_time")
                 ));
             }
         }
@@ -99,7 +106,9 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getDate("booking_date"),
+                        rs.getTime("booking_time")
                 );
             }
         }
@@ -152,7 +161,9 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getDate("booking_date"),
+                        rs.getTime("booking_time")
                 ));
             }
         }
@@ -167,7 +178,7 @@ public class BookingDAO {
             return stmt.executeUpdate() > 0;
         }
     }
-    // ✅ Fetch all bookings (For Admin)
+
     public List<Booking> getAllBookings() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
         String query = "SELECT * FROM booking";
@@ -183,10 +194,13 @@ public class BookingDAO {
                         rs.getString("pickup_location"),
                         rs.getString("dropoff_location"),
                         rs.getDouble("fare"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getDate("booking_date"),
+                        rs.getTime("booking_time")
                 ));
             }
         }
         return bookings;
     }
+
 }

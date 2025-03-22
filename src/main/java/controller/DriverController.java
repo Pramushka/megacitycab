@@ -26,7 +26,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Handle GET requests
+    //  Handle GET requests
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
 
@@ -42,7 +42,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Handle POST requests (Merged to avoid duplicates)
+    //  Handle POST requests (Merged to avoid duplicates)
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
 
@@ -61,7 +61,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Fetch Assigned Rides
+    //  Fetch Assigned Rides
     public void getAssignedBookings(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int driverId = (int) request.getSession().getAttribute("driverId");
         try {
@@ -73,7 +73,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Fetch Ride History
+    //  Fetch Ride History
     private void getRideHistory(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int driverId = (int) request.getSession().getAttribute("driverId");
         try {
@@ -85,7 +85,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Accept Ride
+    //  Accept Ride
     private void acceptRide(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int driverId = (int) request.getSession().getAttribute("driverId");
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
@@ -102,7 +102,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Complete Ride
+    //  Complete Ride
     private void completeRide(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
 
@@ -118,7 +118,7 @@ public class DriverController extends HttpServlet {
         }
     }
 
-    // ✅ Update Ride Status
+    //  Update Ride Status
     private void updateRideStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
         String status = request.getParameter("status");

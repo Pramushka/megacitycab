@@ -86,4 +86,31 @@ public class VehicleDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<Vehicle> getAvailableVehicles(Date bookingDate, Time bookingTime) throws SQLException {
+        String query = "SELECT * FROM vehicle v WHERE NOT EXISTS (" +
+                "SELECT 1 FROM booking b " +
+                "WHERE b.vehicle_id = v.vehicle_id " +
+                "AND b.booking_date = ? " +
+                "AND ABS(TIMESTAMPDIFF(MINUTE, b.booking_time, ?)) < 120)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setDate(1, bookingDate);
+            stmt.setTime(2, bookingTime);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Vehicle> availableVehicles = new ArrayList<>();
+                while (rs.next()) {
+                    Vehicle v = new Vehicle();
+                    v.setVehicleId(rs.getInt("vehicle_id"));
+                    v.setDriverId(rs.getInt("driver_id"));
+                    v.setVehicleNumber(rs.getString("vehicle_number"));
+                    v.setModel(rs.getString("model"));
+                    v.setType(rs.getString("type"));
+                    v.setCapacity(rs.getInt("capacity"));
+                    availableVehicles.add(v);
+                }
+                return availableVehicles;
+            }
+        }
+    }
 }

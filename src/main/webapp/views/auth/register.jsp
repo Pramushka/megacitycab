@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Ninu
-  Date: 12/03/2025
-  Time: 00:06
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html lang="en">
 <head>
@@ -54,66 +47,19 @@
 <div class="container">
     <h2>Customer Registration</h2>
 
-    <!-- Registration Form -->
-    <form id="registerForm">
-        <input type="text" id="firstName" placeholder="First Name" required>
-        <input type="text" id="lastName" placeholder="Last Name" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="text" id="phone" placeholder="Phone" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+    <form method="post" action="<%= request.getContextPath() %>/api/auth/register">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="phone" placeholder="Phone" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
 
         <button type="submit">Register</button>
     </form>
 
     <p>Already have an account? <a href="login.jsp">Login</a></p>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const registerForm = document.getElementById("registerForm");
-
-        registerForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const firstName = document.getElementById("firstName").value;
-            const lastName = document.getElementById("lastName").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            const userData = { firstName, lastName, email, phone, password, userType: "CUSTOMER" };
-
-            // ✅ Fix fetch URL: Must match @WebServlet("/api/auth/*")
-            fetch("/megacitycab_war/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(userData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert("✅ Registration Successful! Redirecting to login...");
-                    window.location.href = "/megacitycab_war/auth/login.jsp"; // ✅ Redirect to login
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("❌ Registration Failed: " + error.message);
-                });
-        });
-    });
-</script>
-
 
 </body>
 </html>

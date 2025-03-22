@@ -25,7 +25,7 @@ public class ManagementService {
     }
 
     //  Fetch all vehicles (USE DAO, NO RAW SQL)
-    public List<Vehicle> getAllVehicles() throws SQLException {
+    public  List<Vehicle> getAllVehicles() throws SQLException {
         return vehicleDAO.getAllVehicles();
     }
 

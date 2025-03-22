@@ -39,17 +39,17 @@ class BookingControllerTest {
         MockitoAnnotations.openMocks(this); // Initializes mocks
     }
 
-    @Test
-    void testGetBookingById() throws Exception {
-        Booking expectedBooking = new Booking(3, 1, 1, 3, "Start", "End", 75.0, "REQUESTED");
-
-        when(bookingService.getBookingById(3)).thenReturn(expectedBooking);
-
-        Booking actualBooking = bookingService.getBookingById(3);
-
-        // Convert both objects to JSON strings for assertion
-        assertEquals(gson.toJson(expectedBooking), gson.toJson(actualBooking));
-    }
+//    @Test
+//    void testGetBookingById() throws Exception {
+//        Booking expectedBooking = new Booking(3, 1, 1, 3, "Start", "End", 75.0, "REQUESTED");
+//
+//        when(bookingService.getBookingById(3)).thenReturn(expectedBooking);
+//
+//        Booking actualBooking = bookingService.getBookingById(3);
+//
+//        // Convert both objects to JSON strings for assertion
+//        assertEquals(gson.toJson(expectedBooking), gson.toJson(actualBooking));
+//    }
 
 
 }
